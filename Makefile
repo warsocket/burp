@@ -4,14 +4,18 @@ define compile =
 endef
 
 define clean =
-	rm $(1).o $(1)
+	rm $(1).o $(1) ;true
 endef
 
+
+all: forkbomb oomkill
 
 forkbomb:
 	$(call compile,forkbomb)
 
-all: forkbomb
+oomkill:
+	$(call compile,oomkill) 
 
 clean:
 	$(call clean,forkbomb)
+	$(call clean,oomkill)
