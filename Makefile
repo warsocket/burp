@@ -8,7 +8,7 @@ define clean =
 endef
 
 
-all: forkbomb oomkill test
+all: forkbomb oomkill
 
 forkbomb:
 	$(call compile,forkbomb)
