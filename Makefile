@@ -10,6 +10,14 @@ endef
 
 all: forkbomb oomkill
 
+docker: forkbomb-docker oomkill-docker
+
+forkbomb-docker: forkbomb
+	docker build -t forkbomb -f forkbomb.Dockerfile .
+
+oomkill-docker: oomkill
+	docker build -t oomkill -f oomkill.Dockerfile .
+
 forkbomb:
 	$(call compile,forkbomb)
 
