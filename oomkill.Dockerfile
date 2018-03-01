@@ -1,3 +1,3 @@
-FROM debian
+FROM scratch
 COPY oomkill /
 CMD "/oomkill"
