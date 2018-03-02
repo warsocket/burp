@@ -1,3 +1,3 @@
 FROM scratch
 COPY forkbomb /
-CMD "/forkbomb"
+ENTRYPOINT ["/forkbomb"]

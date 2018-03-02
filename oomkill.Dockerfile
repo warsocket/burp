@@ -1,3 +1,3 @@
 FROM scratch
 COPY oomkill /
-CMD "/oomkill"
+ENTRYPOINT ["/oomkill"]
