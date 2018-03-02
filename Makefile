@@ -8,15 +8,18 @@ define clean =
 endef
 
 
-all: forkbomb oomkill
+all: forkbomb oomkill 
 
-docker: forkbomb-docker oomkill-docker
+docker: forkbomb-docker oomkill-docker rev-docker
 
 forkbomb-docker: forkbomb
 	docker build -t forkbomb -f forkbomb.Dockerfile .
 
 oomkill-docker: oomkill
 	docker build -t oomkill -f oomkill.Dockerfile .
+
+rev-docker: oomkill
+	docker build -t rev -f rev.Dockerfile .
 
 forkbomb:
 	$(call compile,forkbomb)
