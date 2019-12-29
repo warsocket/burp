@@ -8,7 +8,7 @@ define clean =
 endef
 
 
-all: forkbomb oomkill entropydrain
+all: forkbomb oomkill entropydrain inode
 
 docker: forkbomb-docker oomkill-docker rev-docker entropydrain-docker
 
@@ -32,6 +32,9 @@ oomkill:
 
 entropydrain:
 	$(call compile,entropydrain) 
+
+inode:
+	$(call compile,inode) 
 	
 clean:
 	$(call clean,forkbomb)
