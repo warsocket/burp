@@ -1,3 +1,3 @@
 FROM scratch
 COPY inode /
-ENTRYPOINT ["/indoe"]
+ENTRYPOINT ["/inode"]
